@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+if ! [ -t 0 ]; then
+  echo -n "$(< /dev/stdin)" | cat > data.txt
+elif [ "x$1" = "xcb" ]; then
+  cb-out data.txt
+  shift
+else
+  cat $1 > data.txt
+  shift
+fi
+
+if [ "x$1" = "xenc" ]; then
+  (
+  gpg --encrypt --armor data.txt
+  cat data.txt.asc | cb-in
+  rm data.txt*
+  )
+else
+  gpg --decrypt data.txt
+  rm data.txt*
+fi
